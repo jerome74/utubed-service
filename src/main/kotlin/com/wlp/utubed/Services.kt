@@ -7,7 +7,16 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.stereotype.Service
 import java.io.File
 import com.github.kiulian.downloader.YoutubeDownloader
-import javax.annotation.PostConstruct
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
+import com.google.api.client.http.HttpRequestInitializer
+import com.google.api.client.json.jackson2.JacksonFactory
+import com.google.api.services.youtube.YouTube
+import it.sauronsoftware.jave.AudioAttributes;
+import it.sauronsoftware.jave.Encoder;
+import it.sauronsoftware.jave.EncoderException;
+import it.sauronsoftware.jave.EncodingAttributes;
+import it.sauronsoftware.jave.InputFormatException;
+import java.util.*
 
 
 @Service
@@ -50,14 +59,116 @@ class UtubeD {
         downloader!!.setParserRetryOnFailure(1)
     }
 
+    /**
+     * @Throws(Exception::class)
+     * @return Unit
+     */
+
     @Throws(Exception::class)
-    fun getInfo(info: VideoInfo)
-    {
+    fun getInfo(info: VideoInfo) {
+
         val video = downloader!!.getVideo(info.idv);
 
         val details = video.details();
 
         info.title      = details.title()
         info.thumbnail  = details.thumbnails()[0]
+    }
+
+    /**
+     * @Throws(Exception::class, IllegalArgumentException::class, InputFormatException::class, EncoderException::class)
+     * @return String
+     */
+
+    @Throws(Exception::class, IllegalArgumentException::class, InputFormatException::class, EncoderException::class)
+    fun download(info: VideoInfo, type : String) : String{
+
+        val video = downloader!!.getVideo(info.idv);
+
+        val videoWithAudioFormats = video.videoWithAudioFormats();
+        videoWithAudioFormats.forEach{println("${it.audioQuality()} = ${it.url()}")}
+
+        val outputDir = File("/src/main/resources/videos");
+        val format = videoWithAudioFormats.get(0);
+
+        // sync downloading
+        val source = video.download(format, outputDir);
+        val target = File("/src/main/resources/videos/target.mp3");
+
+        val audio	= AudioAttributes()
+
+        if(type.equals("mp3"))
+            audio.setCodec("libmp3lame")
+
+        audio.setBitRate(128000)
+        audio.setChannels(2)
+        audio.setSamplingRate(44100)
+
+        val attrs = EncodingAttributes();
+
+        attrs.setFormat("mp3");
+        attrs.setAudioAttributes(audio);
+
+        val encoder = Encoder();
+
+        encoder.encode(source, target, attrs)
+
+        return Base64.getEncoder().encodeToString(target. readBytes())
+    }
+
+
+
+    fun findVideo(research : String) : List<SearchResult>{
+
+        var  youtube = YouTube.Builder(GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), HttpRequestInitializer() {}).setApplicationName("youtube-cmdline-search-sample").build()
+
+        // api key
+        val apiKey = "AIzaSyARDAkWqWZZ4a8PPCn3SdojXqrDfwVXZ2g"
+
+        // Define the API request for retrieving search results.
+        val search = youtube.search().list("id,snippet");
+
+        // Set your developer key from the Google Cloud Console for
+        // non-authenticated requests. See:
+        // https://cloud.google.com/console
+        search.setKey(apiKey);
+        search.setQ(research);
+
+        // To increase efficiency, only retrieve the fields that the
+        // application uses.
+        search.setFields("items(id/kind,id/videoId,snippet/title,snippet/thumbnails/default/url)");
+        search.setMaxResults(10);
+
+        // Call the API and print results.
+        val searchResponse = search.execute()
+        val searchResultList = searchResponse.getItems();
+
+        var itsearch = searchResultList.iterator();
+
+        var result = mutableListOf<SearchResult>()
+
+        while (itsearch.hasNext()) {
+
+            var searchResult = itsearch.next()
+            var snippet = searchResult.snippet
+
+            var singleSearchResult = SearchResult()
+
+
+            if(!searchResult.id.videoId.isNullOrBlank())    singleSearchResult.id               = searchResult.id.videoId
+            if(!searchResult.etag.isNullOrBlank())          singleSearchResult.etag             = searchResult.etag
+            if(!searchResult.kind.isNullOrBlank())          singleSearchResult.kind             = searchResult.kind
+            if(!snippet.channelId.isNullOrBlank())          singleSearchResult.channelId        = snippet.channelId
+            if(!snippet.channelTitle.isNullOrBlank())       singleSearchResult.channelTitle     = snippet.channelTitle
+            if(!snippet.description.isNullOrBlank())        singleSearchResult.description      = snippet.description
+            if(!snippet.title.isNullOrBlank())              singleSearchResult.title            = snippet.title
+            if(!snippet.thumbnails.isEmpty())               singleSearchResult.thumbnails       = snippet.thumbnails.toString()
+
+            result.add(singleSearchResult)
+
+        }
+
+        return result
+
     }
 }

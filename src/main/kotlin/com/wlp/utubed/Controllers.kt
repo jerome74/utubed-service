@@ -2,10 +2,7 @@ package com.wlp.utubed
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/utubed")
@@ -19,8 +16,21 @@ class RestLocationController{
     }
 
     @PostMapping(path = ["/info"] , produces= [MediaType.APPLICATION_JSON_VALUE] )
-    fun login(@RequestBody info : VideoInfo) : VideoInfo {
+    fun info(@RequestBody info : VideoInfo) : VideoInfo {
         utubeD.getInfo(info)
         return info
     }
+
+    @PostMapping(path = ["/download/{type}"] , produces= [MediaType.APPLICATION_JSON_VALUE] )
+    fun download(@PathVariable type : String, @RequestBody info : VideoInfo) : AudioFile {
+
+        return AudioFile(type,utubeD.download(info, type))
+    }
+
+    @PostMapping(path = ["/find"] , produces= [MediaType.APPLICATION_JSON_VALUE] )
+    fun find(@RequestBody finder : finderVideo) : List<SearchResult> {
+
+        return utubeD.findVideo(finder.research)
+    }
+
 }
