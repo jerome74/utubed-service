@@ -88,12 +88,12 @@ class UtubeD {
         val videoWithAudioFormats = video.videoWithAudioFormats();
         videoWithAudioFormats.forEach{println("${it.audioQuality()} = ${it.url()}")}
 
-        val outputDir = File("/src/main/resources/videos");
+        val outputDir = kotlin.io.createTempDir("videos_");
         val format = videoWithAudioFormats.get(0);
 
         // sync downloading
         val source = video.download(format, outputDir);
-        val target = File("/src/main/resources/videos/target.mp3");
+        val target = kotlin.io.createTempFile("videos_",".mp3", outputDir);
 
         val audio	= AudioAttributes()
 
@@ -112,6 +112,8 @@ class UtubeD {
         val encoder = Encoder();
 
         encoder.encode(source, target, attrs)
+
+        outputDir.deleteOnExit()
 
         return Base64.getEncoder().encodeToString(target. readBytes())
     }
