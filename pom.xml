@@ -122,8 +122,8 @@
 			<groupId>it.sauronsoftware</groupId>
 			<artifactId>jave</artifactId>
 			<version>1.0.2</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/src/main/resources/lib/jave-1.0.2.jar</systemPath>
+			<!--scope>system</scope>
+			<systemPath>${basedir}/src/main/resources/lib/jave-1.0.2.jar</systemPath -->
 		</dependency>
 
 	</dependencies>
