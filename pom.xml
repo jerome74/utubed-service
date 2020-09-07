@@ -19,6 +19,13 @@
 			<id>jitpack.io</id>
 			<url>https://jitpack.io</url>
 		</repository>
+
+		<repository>
+			<id>project.local</id>
+			<name>project</name>
+			<url>file:${project.basedir}/src/main/resources/lib</url>
+		</repository>
+
 	</repositories>
 
 	<properties>
