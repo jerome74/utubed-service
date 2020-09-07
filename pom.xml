@@ -15,15 +15,16 @@
 	<description>UtubeD project for Spring Boot</description>
 
 	<repositories>
-		<repository>
-			<id>jitpack.io</id>
-			<url>https://jitpack.io</url>
-		</repository>
 
 		<repository>
 			<id>project.local</id>
 			<name>project</name>
 			<url>file:${project.basedir}/src/main/resources/lib</url>
+		</repository>
+
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
 		</repository>
 
 	</repositories>
