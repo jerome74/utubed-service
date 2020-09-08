@@ -15,6 +15,6 @@ create TABLE Userprofile(id INT AUTO_INCREMENT  PRIMARY KEY
 
      insert into Users (username, password, active ) values ('walter.longo74@gmail.com','admin123', TRUE);
 
-     insert into Userprofile (nickname, email, avatarname ,avatarcolor) values ('walter','walter.longo74@gmail.com','admin','[0.5, 0.5, 0.5, 1]');
+     insert into Userprofile (nickname, email, avatarname ,avatarcolor) values ('walter','walter.longo74@gmail.com','users','[0.5, 0.5, 0.5, 1]');
 
 commit;
