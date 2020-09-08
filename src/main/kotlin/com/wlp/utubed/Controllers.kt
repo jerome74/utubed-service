@@ -11,8 +11,16 @@ class RestLocationController{
     @Autowired
     lateinit var utubeD: UtubeD
 
+    @Autowired
+    lateinit var userprofileRepository: UserprofileRepository
+
     @PostMapping(path = ["/login"] , produces= [MediaType.APPLICATION_JSON_VALUE] )
     fun login(@RequestBody credential : UserAndPasswordAuthenticationRequest) {
+    }
+
+    @GetMapping(path=["/profile/{email}"], produces=[MediaType.APPLICATION_JSON_VALUE] )
+    fun getProfileByEmail(@PathVariable email : String) : Userprofile {
+        return userprofileRepository.findByEmail(email).orElseThrow { RuntimeException("Any Profile Found!") }
     }
 
     @PostMapping(path = ["/info"] , produces= [MediaType.APPLICATION_JSON_VALUE] )
