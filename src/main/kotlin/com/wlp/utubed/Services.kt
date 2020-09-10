@@ -157,25 +157,28 @@ class UtubeD {
 
             var singleSearchResult = SearchResult()
 
-            if(!searchResult.id.videoId.isNullOrBlank())    singleSearchResult.id               = searchResult.id.videoId
-            if(!searchResult.etag.isNullOrBlank())          singleSearchResult.etag             = searchResult.etag
-            if(!searchResult.kind.isNullOrBlank())          singleSearchResult.kind             = searchResult.kind
-            if(!snippet.channelId.isNullOrBlank())          singleSearchResult.channelId        = snippet.channelId
-            if(!snippet.channelTitle.isNullOrBlank())       singleSearchResult.channelTitle     = snippet.channelTitle
-            if(!snippet.description.isNullOrBlank())        singleSearchResult.description      = snippet.description
-            if(!snippet.title.isNullOrBlank())              singleSearchResult.title            = snippet.title
-            if(!snippet.thumbnails.isEmpty())               singleSearchResult.thumbnails       = snippet.thumbnails.toString()
+            try{
 
-            if(!searchResult.id.videoId.isNullOrBlank()) {
+                if(!searchResult.id.videoId.isNullOrBlank())    singleSearchResult.id               = searchResult.id.videoId
+                if(!searchResult.etag.isNullOrBlank())          singleSearchResult.etag             = searchResult.etag
+                if(!searchResult.kind.isNullOrBlank())          singleSearchResult.kind             = searchResult.kind
+                if(!snippet.channelId.isNullOrBlank())          singleSearchResult.channelId        = snippet.channelId
+                if(!snippet.channelTitle.isNullOrBlank())       singleSearchResult.channelTitle     = snippet.channelTitle
+                if(!snippet.description.isNullOrBlank())        singleSearchResult.description      = snippet.description
+                if(!snippet.title.isNullOrBlank())              singleSearchResult.title            = snippet.title
+                if(!snippet.thumbnails.isEmpty())               singleSearchResult.thumbnails       = snippet.thumbnails.toString()
 
-                val video = downloader!!.getVideo(singleSearchResult.id);
-                var time  = video.details().lengthSeconds() * 1000
+                if(!searchResult.id.videoId.isNullOrBlank()) {
 
-                var sdf = SimpleDateFormat("HH:mm:ss")
-                sdf.timeZone = TimeZone.getTimeZone("GMT - 01:00")
+                    val video = downloader!!.getVideo(singleSearchResult.id);
+                    var time  = video.details().lengthSeconds() * 1000
 
-                singleSearchResult.length = sdf.format(Date(time.toLong()))
-            }
+                    var sdf = SimpleDateFormat("HH:mm:ss")
+                    sdf.timeZone = TimeZone.getTimeZone("GMT - 01:00")
+
+                    singleSearchResult.length = sdf.format(Date(time.toLong()))
+                }
+            }catch (e : Exception){continue}
 
             result.add(singleSearchResult)
 
