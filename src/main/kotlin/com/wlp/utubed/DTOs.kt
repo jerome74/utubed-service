@@ -10,6 +10,7 @@ class SearchResult(var id :String = ""
                    ,var channelTitle :String = ""
                    ,var description :String = ""
                    ,var title :String = ""
-                   ,var thumbnails :String = "" )
+                   ,var thumbnails :String = ""
+                   ,var length : String = "")
 
 

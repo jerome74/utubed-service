@@ -16,6 +16,7 @@ import it.sauronsoftware.jave.Encoder;
 import it.sauronsoftware.jave.EncoderException;
 import it.sauronsoftware.jave.EncodingAttributes;
 import it.sauronsoftware.jave.InputFormatException;
+import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -156,7 +157,6 @@ class UtubeD {
 
             var singleSearchResult = SearchResult()
 
-
             if(!searchResult.id.videoId.isNullOrBlank())    singleSearchResult.id               = searchResult.id.videoId
             if(!searchResult.etag.isNullOrBlank())          singleSearchResult.etag             = searchResult.etag
             if(!searchResult.kind.isNullOrBlank())          singleSearchResult.kind             = searchResult.kind
@@ -165,6 +165,17 @@ class UtubeD {
             if(!snippet.description.isNullOrBlank())        singleSearchResult.description      = snippet.description
             if(!snippet.title.isNullOrBlank())              singleSearchResult.title            = snippet.title
             if(!snippet.thumbnails.isEmpty())               singleSearchResult.thumbnails       = snippet.thumbnails.toString()
+
+            if(!searchResult.id.videoId.isNullOrBlank()) {
+
+                val video = downloader!!.getVideo(singleSearchResult.id);
+                var time  = video.details().lengthSeconds() * 1000
+
+                var sdf = SimpleDateFormat("HH:mm:ss")
+                sdf.timeZone = TimeZone.getTimeZone("GMT - 01:00")
+
+                singleSearchResult.length = sdf.format(Date(time.toLong()))
+            }
 
             result.add(singleSearchResult)
 
