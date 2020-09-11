@@ -150,6 +150,9 @@ class UtubeD {
 
         var result = mutableListOf<SearchResult>()
 
+        var sdf = SimpleDateFormat("HH:mm:ss")
+        sdf.timeZone = TimeZone.getTimeZone("GMT - 01:00")
+
         while (itsearch.hasNext()) {
 
             var searchResult = itsearch.next()
@@ -159,7 +162,11 @@ class UtubeD {
 
             try{
 
-                if(!searchResult.id.videoId.isNullOrBlank())    singleSearchResult.id               = searchResult.id.videoId
+                if(!searchResult.id.videoId.isNullOrBlank()) {
+                    singleSearchResult.id = searchResult.id.videoId
+                    singleSearchResult.length = sdf.format(Date((downloader!!.getVideo(singleSearchResult.id).details().lengthSeconds() * 1000).toLong()))
+                }
+
                 if(!searchResult.etag.isNullOrBlank())          singleSearchResult.etag             = searchResult.etag
                 if(!searchResult.kind.isNullOrBlank())          singleSearchResult.kind             = searchResult.kind
                 if(!snippet.channelId.isNullOrBlank())          singleSearchResult.channelId        = snippet.channelId
@@ -168,16 +175,7 @@ class UtubeD {
                 if(!snippet.title.isNullOrBlank())              singleSearchResult.title            = snippet.title
                 if(!snippet.thumbnails.isEmpty())               singleSearchResult.thumbnails       = snippet.thumbnails.toString()
 
-                if(!searchResult.id.videoId.isNullOrBlank()) {
 
-                    val video = downloader!!.getVideo(singleSearchResult.id);
-                    var time  = video.details().lengthSeconds() * 1000
-
-                    var sdf = SimpleDateFormat("HH:mm:ss")
-                    sdf.timeZone = TimeZone.getTimeZone("GMT - 01:00")
-
-                    singleSearchResult.length = sdf.format(Date(time.toLong()))
-                }
             }catch (e : Exception){continue}
 
             result.add(singleSearchResult)
