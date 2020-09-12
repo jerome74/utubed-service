@@ -82,7 +82,7 @@ class UtubeD {
      */
 
     @Throws(Exception::class, IllegalArgumentException::class, InputFormatException::class, EncoderException::class)
-    fun download(info: VideoInfo, type : String) : String{
+    fun download(info: VideoInfo, type : String) : File{
 
         val video = downloader!!.getVideo(info.idv);
 
@@ -116,7 +116,7 @@ class UtubeD {
 
         outputDir.deleteOnExit()
 
-        return Base64.getEncoder().encodeToString(target. readBytes())
+        return target
     }
 
 

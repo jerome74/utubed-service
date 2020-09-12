@@ -1,8 +1,13 @@
 package com.wlp.utubed
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.io.InputStreamResource
+import org.springframework.core.io.Resource
+import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.io.FileInputStream
 
 @RestController
 @RequestMapping("/api/utubed")
@@ -30,9 +35,22 @@ class RestLocationController{
     }
 
     @PostMapping(path = ["/download/{type}"] , produces= [MediaType.APPLICATION_JSON_VALUE] )
-    fun download(@PathVariable type : String, @RequestBody info : VideoInfo) : AudioFile {
+    fun download(@PathVariable type : String, @RequestBody info : VideoInfo) : ResponseEntity<Resource> {
 
-        return AudioFile(type,utubeD.download(info, type))
+        val header =  HttpHeaders();
+        header.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=download.mp3");
+        header.add("Cache-Control", "no-cache, no-store, must-revalidate");
+        header.add("Pragma", "no-cache");
+        header.add("Expires", "0");
+
+        val fileAudio = utubeD.download(info, type)
+
+        val resource = InputStreamResource(FileInputStream(fileAudio));
+
+        return ResponseEntity.ok()
+                .contentLength(fileAudio.length())
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
     }
 
     @PostMapping(path = ["/find"] , produces= [MediaType.APPLICATION_JSON_VALUE] )
