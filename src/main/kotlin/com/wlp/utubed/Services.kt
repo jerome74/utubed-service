@@ -78,11 +78,35 @@ class UtubeD {
 
     /**
      * @Throws(Exception::class, IllegalArgumentException::class, InputFormatException::class, EncoderException::class)
-     * @return String
+     * @return File
      */
 
     @Throws(Exception::class, IllegalArgumentException::class, InputFormatException::class, EncoderException::class)
-    fun download(info: VideoInfo, type : String) : File{
+    fun downloadMp4(info: VideoInfo) : File{
+
+        val video = downloader!!.getVideo(info.idv);
+
+        val videoWithAudioFormats = video.videoWithAudioFormats();
+        videoWithAudioFormats.forEach{println("${it.audioQuality()} = ${it.url()}")}
+
+        val outputDir = kotlin.io.createTempDir("videos_");
+        val format = videoWithAudioFormats.get(0);
+
+        // sync downloading
+        val target = video.download(format, outputDir);
+
+        outputDir.deleteOnExit()
+
+        return target
+    }
+
+    /**
+     * @Throws(Exception::class, IllegalArgumentException::class, InputFormatException::class, EncoderException::class)
+     * @return File
+     */
+
+    @Throws(Exception::class, IllegalArgumentException::class, InputFormatException::class, EncoderException::class)
+    fun downloadMp3(info: VideoInfo) : File{
 
         val video = downloader!!.getVideo(info.idv);
 
@@ -98,8 +122,7 @@ class UtubeD {
 
         val audio	= AudioAttributes()
 
-        if(type.equals("mp3"))
-            audio.setCodec("libmp3lame")
+        audio.setCodec("libmp3lame")
 
         audio.setBitRate(128000)
         audio.setChannels(2)

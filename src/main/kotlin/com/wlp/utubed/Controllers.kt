@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.io.File
 import java.io.FileInputStream
 
 @RestController
@@ -43,12 +44,18 @@ class RestLocationController{
         header.add("Pragma", "no-cache");
         header.add("Expires", "0");
 
-        val fileAudio = utubeD.download(info, type)
+        var fileAudio : File? = null
 
-        val resource = InputStreamResource(FileInputStream(fileAudio));
+        when(type)
+        {
+            "mp3" -> fileAudio = utubeD.downloadMp3(info)
+            "mp4" -> fileAudio = utubeD.downloadMp4(info)
+        }
+
+        val resource = InputStreamResource(FileInputStream(fileAudio!!));
 
         return ResponseEntity.ok()
-                .contentLength(fileAudio.length())
+                .contentLength(fileAudio!!.length())
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
     }
