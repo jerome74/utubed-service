@@ -71,7 +71,13 @@ class JwtTokenVerifier : OncePerRequestFilter()
 
         val authoritation = request.getHeader("Authentication")
 
-        if(authoritation.isNullOrBlank() || !authoritation.startsWith("Bearer")){
+        if(request.requestURI.equals("/api/utubed/signin")){
+
+            val authenticationAuth = UsernamePasswordAuthenticationToken("guest",null,Config.UserRole.ADMIN.getGrantedAuthority())
+            SecurityContextHolder.getContext().authentication = authenticationAuth
+            filterChain.doFilter(request,response)
+        }
+        else if(authoritation.isNullOrBlank() || !authoritation.startsWith("Bearer")){
             filterChain.doFilter(request,response)
             return
         }

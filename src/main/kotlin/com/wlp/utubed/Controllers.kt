@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.InputStreamResource
 import org.springframework.core.io.Resource
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -22,6 +23,14 @@ class RestLocationController{
 
     @PostMapping(path = ["/login"] , produces= [MediaType.APPLICATION_JSON_VALUE] )
     fun login(@RequestBody credential : UserAndPasswordAuthenticationRequest) {
+    }
+
+    @PostMapping(path = ["/signin"] , produces= [MediaType.APPLICATION_JSON_VALUE] )
+    fun signin(@RequestBody credential : UserSingIn) : ResponseEntity<String> {
+        if(Register().registerUser(credential))
+            return ResponseEntity(HttpStatus.UNAUTHORIZED);
+        else
+            return ResponseEntity(HttpStatus.OK);
     }
 
     @GetMapping(path=["/profile/{email}"], produces=[MediaType.APPLICATION_JSON_VALUE] )

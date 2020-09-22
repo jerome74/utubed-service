@@ -54,7 +54,7 @@ class Config : WebSecurityConfigurerAdapter() {
         ADMIN(setOf(UserPermissions.ADMIN_READ,UserPermissions.ADMIN_WRITE,UserPermissions.ADMIN_DELETE));
 
 
-        fun getGrantedAuthority(): Set<SimpleGrantedAuthority> {
+         fun getGrantedAuthority(): Set<SimpleGrantedAuthority> {
             var permissions = permission.stream().map { SimpleGrantedAuthority(it.permission) }.collect(Collectors.toSet())
             permissions.add(SimpleGrantedAuthority("ROLE_" + this.name))
             return permissions

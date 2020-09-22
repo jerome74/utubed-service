@@ -32,6 +32,9 @@ class UsersDetailsService : UserDetailsService {
         var builder : User.UserBuilder? = null
         repository.findByUsername(username!!).ifPresent({
 
+            if (!it.active)
+                return@ifPresent
+
             builder = User.withUsername(it.username);
             builder!!.password(Util.crypto.encode(it.password));
             builder!!.authorities(Config.UserRole.ADMIN.getGrantedAuthority())
@@ -207,5 +210,36 @@ class UtubeD {
 
         return result
 
+    }
+}
+
+@Service
+class Register
+{
+    lateinit var usersRepository : UsersRepository
+    lateinit var userprofileRepository: UserprofileRepository
+
+    fun registerUser(user : UserSingIn) : Boolean
+    {
+        var newId = 1
+        usersRepository.findTopByOrderByIdDesc().ifPresent {  newId = it.id.plus(1)  }
+
+        if(user.email.isNullOrEmpty() || user.password.isNullOrEmpty() || user.nickname.isNullOrEmpty())
+            return false
+
+        if(usersRepository.save(Users(newId, user.email, user.password, false)) == null){
+            return false
+        }
+        else {
+            var newIdProfile = 1
+            userprofileRepository.findTopByOrderByIdDesc().ifPresent { newIdProfile = it.id.plus(1) }
+
+            if (userprofileRepository.save(Userprofile(newIdProfile, user.nickname, user.email, "users", "[0.5, 0.5, 0.5, 1]")) == null) {
+                return false
+            } else {
+                //@todo inviare email
+                return true
+            }
+        }
     }
 }
