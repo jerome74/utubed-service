@@ -42,7 +42,7 @@ class RestLocationController{
             return ResponseEntity(HttpStatus.OK);
     }
 
-    @GetMapping(path = ["/confirm/{email}"] , produces= [MediaType.APPLICATION_JSON_VALUE] )
+    @GetMapping(path = ["/confirm/{email}"]  )
     fun confirm(@PathVariable email : String) : String? {
         val user = usersRepository.findByUsername(email).orElseThrow { RuntimeException("Any User Found!") }
         user.active = true
