@@ -19,7 +19,16 @@ class RestLocationController{
     lateinit var utubeD: UtubeD
 
     @Autowired
+    lateinit var register: Register
+
+    @Autowired
     lateinit var userprofileRepository: UserprofileRepository
+
+    @Autowired
+    lateinit var config: ConfigProperties
+
+    @Autowired
+    lateinit var usersRepository: UsersRepository
 
     @PostMapping(path = ["/login"] , produces= [MediaType.APPLICATION_JSON_VALUE] )
     fun login(@RequestBody credential : UserAndPasswordAuthenticationRequest) {
@@ -27,10 +36,20 @@ class RestLocationController{
 
     @PostMapping(path = ["/signin"] , produces= [MediaType.APPLICATION_JSON_VALUE] )
     fun signin(@RequestBody credential : UserSingIn) : ResponseEntity<String> {
-        if(Register().registerUser(credential))
+        if(!register.registerUser(credential))
             return ResponseEntity(HttpStatus.UNAUTHORIZED);
         else
             return ResponseEntity(HttpStatus.OK);
+    }
+
+    @GetMapping(path = ["/confirm/{email}"] , produces= [MediaType.APPLICATION_JSON_VALUE] )
+    fun confirm(@PathVariable email : String) : String? {
+        val user = usersRepository.findByUsername(email).orElseThrow { RuntimeException("Any User Found!") }
+        user.active = true
+        usersRepository.save(user)
+
+        return config.getPropertes("mail.ok")
+
     }
 
     @GetMapping(path=["/profile/{email}"], produces=[MediaType.APPLICATION_JSON_VALUE] )

@@ -71,7 +71,7 @@ class JwtTokenVerifier : OncePerRequestFilter()
 
         val authoritation = request.getHeader("Authentication")
 
-        if(request.requestURI.equals("/api/utubed/signin")){
+        if(request.requestURI.equals("/api/utubed/signin") || request.requestURI.startsWith("/api/utubed/confirm")){
 
             val authenticationAuth = UsernamePasswordAuthenticationToken("guest",null,Config.UserRole.ADMIN.getGrantedAuthority())
             SecurityContextHolder.getContext().authentication = authenticationAuth

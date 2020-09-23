@@ -1,21 +1,19 @@
 package com.wlp.utubed
 
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.security.core.userdetails.User
-import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.security.core.userdetails.UserDetailsService
-import org.springframework.stereotype.Service
-import java.io.File
 import com.github.kiulian.downloader.YoutubeDownloader
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.http.HttpRequestInitializer
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.youtube.YouTube
-import it.sauronsoftware.jave.AudioAttributes;
-import it.sauronsoftware.jave.Encoder;
-import it.sauronsoftware.jave.EncoderException;
-import it.sauronsoftware.jave.EncodingAttributes;
-import it.sauronsoftware.jave.InputFormatException;
+import it.sauronsoftware.jave.*
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.mail.SimpleMailMessage
+import org.springframework.mail.javamail.JavaMailSender
+import org.springframework.security.core.userdetails.User
+import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.stereotype.Service
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -121,7 +119,7 @@ class UtubeD {
 
         // sync downloading
         val source = video.download(format, outputDir);
-        val target = kotlin.io.createTempFile("videos_",".mp3", outputDir);
+        val target = kotlin.io.createTempFile("videos_", ".mp3", outputDir);
 
         val audio	= AudioAttributes()
 
@@ -147,7 +145,7 @@ class UtubeD {
 
 
 
-    fun findVideo(research : String) : List<SearchResult>{
+    fun findVideo(research: String) : List<SearchResult>{
 
         var  youtube = YouTube.Builder(GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), HttpRequestInitializer() {}).setApplicationName("youtube-cmdline-search-sample").build()
 
@@ -202,7 +200,7 @@ class UtubeD {
                 if(!snippet.thumbnails.isEmpty())               singleSearchResult.thumbnails       = snippet.thumbnails.toString()
 
 
-            }catch (e : Exception){continue}
+            }catch (e: Exception){continue}
 
             result.add(singleSearchResult)
 
@@ -216,10 +214,19 @@ class UtubeD {
 @Service
 class Register
 {
+    @Autowired
     lateinit var usersRepository : UsersRepository
+
+    @Autowired
     lateinit var userprofileRepository: UserprofileRepository
 
-    fun registerUser(user : UserSingIn) : Boolean
+    @Autowired
+    lateinit var emailSender: JavaMailSender
+
+    @Autowired
+    lateinit var config: ConfigProperties
+
+    fun registerUser(user: UserSingIn) : Boolean
     {
         var newId = 1
         usersRepository.findTopByOrderByIdDesc().ifPresent {  newId = it.id.plus(1)  }
@@ -237,7 +244,22 @@ class Register
             if (userprofileRepository.save(Userprofile(newIdProfile, user.nickname, user.email, "users", "[0.5, 0.5, 0.5, 1]")) == null) {
                 return false
             } else {
-                //@todo inviare email
+                val message = SimpleMailMessage();
+                message.setFrom("utubed.service@gmail.com");
+                message.setTo(user.email);
+                message.setSubject( "${config.getPropertes("mail.subject")}" +
+                                    "${user.nickname}");
+
+                message.setText("${config.getPropertes("mail.text1")}" +
+                                "${user.nickname}" +
+                                "${config.getPropertes("mail.text2")}" +
+                                "${config.getPropertes("mail.text3")}" +
+                                "${config.getPropertes("mail.text4")}" +
+                                "${user.email}");
+
+                try {emailSender.send(message)}catch (e: Exception){println(e.message)
+                    return false}
+
                 return true
             }
         }

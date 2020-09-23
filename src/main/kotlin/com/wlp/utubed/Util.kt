@@ -1,10 +1,24 @@
 package com.wlp.utubed
 
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.PropertySource
+import org.springframework.core.env.Environment
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.stereotype.Component
 
 object Util
 {
     val crypto = BCryptPasswordEncoder(12)
+}
+
+@Component
+@PropertySource("classpath:application.properties")
+class ConfigProperties
+{
+    @Autowired
+    lateinit var env : Environment
+
+    fun getPropertes(prop : String) : String? = env.getProperty(prop)
 }
 
 /*
