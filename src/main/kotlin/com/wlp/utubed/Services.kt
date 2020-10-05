@@ -86,19 +86,11 @@ class UtubeD {
     fun downloadMp4(info: VideoInfo) : File{
 
         val video = downloader!!.getVideo(info.idv);
-
-        val videoWithAudioFormats = video.videoWithAudioFormats();
-        videoWithAudioFormats.forEach{println("${it.audioQuality()} = ${it.url()}")}
-
         val outputDir = kotlin.io.createTempDir("videos_");
-        val format = videoWithAudioFormats.get(0);
-
-        // sync downloading
-        val target = video.download(format, outputDir);
 
         outputDir.deleteOnExit()
 
-        return target
+        return video.download(video.videoWithAudioFormats().get(0), outputDir)
     }
 
     /**
