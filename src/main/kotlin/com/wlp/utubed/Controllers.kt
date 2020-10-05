@@ -1,5 +1,6 @@
 package com.wlp.utubed
 
+import io.jsonwebtoken.ExpiredJwtException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.InputStreamResource
 import org.springframework.core.io.Resource
@@ -80,12 +81,10 @@ class RestLocationController{
             "mp4" -> fileAudio = utubeD.downloadMp4(info)
         }
 
-        val resource = InputStreamResource(FileInputStream(fileAudio!!));
-
         return ResponseEntity.ok()
                 .contentLength(fileAudio!!.length())
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(resource);
+                .body(InputStreamResource(FileInputStream(fileAudio!!)));
     }
 
     @PostMapping(path = ["/find"] , produces= [MediaType.APPLICATION_JSON_VALUE] )

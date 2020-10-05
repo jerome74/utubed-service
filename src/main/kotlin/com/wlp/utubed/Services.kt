@@ -145,22 +145,20 @@ class UtubeD {
         val apiKey = "AIzaSyARDAkWqWZZ4a8PPCn3SdojXqrDfwVXZ2g"
 
         // Define the API request for retrieving search results.
-        val search = youtube.search().list("id,snippet");
+        val search = youtube.Search().list("id,snippet");
 
         // Set your developer key from the Google Cloud Console for
         // non-authenticated requests. See:
         // https://cloud.google.com/console
         search.setKey(apiKey);
         search.setQ(research);
-
-        // To increase efficiency, only retrieve the fields that the
-        // application uses.
-        search.setFields("items(id/kind,id/videoId,snippet/title,snippet/thumbnails/default/url)");
-        search.setMaxResults(10);
+        search.setFields("items(id/videoId)");
+        search.setMaxResults(15);
 
         // Call the API and print results.
         val searchResponse = search.execute()
         val searchResultList = searchResponse.getItems();
+
 
         var itsearch = searchResultList.iterator();
 
@@ -172,29 +170,35 @@ class UtubeD {
         while (itsearch.hasNext()) {
 
             var searchResult = itsearch.next()
-            var snippet = searchResult.snippet
 
             var singleSearchResult = SearchResult()
 
             try{
 
                 if(!searchResult.id.videoId.isNullOrBlank()) {
-                    singleSearchResult.id = searchResult.id.videoId
-                    singleSearchResult.length = sdf.format(Date((downloader!!.getVideo(singleSearchResult.id).details().lengthSeconds() * 1000).toLong()))
-                }
 
-                if(!searchResult.etag.isNullOrBlank())          singleSearchResult.etag             = searchResult.etag
-                if(!searchResult.kind.isNullOrBlank())          singleSearchResult.kind             = searchResult.kind
-                if(!snippet.channelId.isNullOrBlank())          singleSearchResult.channelId        = snippet.channelId
-                if(!snippet.channelTitle.isNullOrBlank())       singleSearchResult.channelTitle     = snippet.channelTitle
-                if(!snippet.description.isNullOrBlank())        singleSearchResult.description      = snippet.description
-                if(!snippet.title.isNullOrBlank())              singleSearchResult.title            = snippet.title
-                if(!snippet.thumbnails.isEmpty())               singleSearchResult.thumbnails       = snippet.thumbnails.toString()
+                    singleSearchResult.id = searchResult.id.videoId
+
+                    val video = downloader!!.getVideo(singleSearchResult.id)
+
+
+                    singleSearchResult.etag             = ""
+                    singleSearchResult.kind             = ""
+                    singleSearchResult.channelId        = ""
+                    singleSearchResult.channelTitle     = video.details().author()
+                    singleSearchResult.description      = video.details().description()
+                    singleSearchResult.title            = video.details().title()
+                    singleSearchResult.thumbnails       = video.details().thumbnails().get(0)
+                    singleSearchResult.length           = sdf.format(Date((video.details().lengthSeconds() * 1000).toLong()))
+
+                    result.add(singleSearchResult)
+
+                }
 
 
             }catch (e: Exception){continue}
 
-            result.add(singleSearchResult)
+
 
         }
 
