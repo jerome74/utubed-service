@@ -186,7 +186,7 @@ class UtubeD {
                     singleSearchResult.kind             = ""
                     singleSearchResult.channelId        = ""
                     singleSearchResult.channelTitle     = video.details().author()
-                    singleSearchResult.description      = video.details().description()
+                    singleSearchResult.description      = ""
                     singleSearchResult.title            = video.details().title()
                     singleSearchResult.thumbnails       = video.details().thumbnails().get(0)
                     singleSearchResult.length           = sdf.format(Date((video.details().lengthSeconds() * 1000).toLong()))
