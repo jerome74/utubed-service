@@ -40,7 +40,7 @@ class Config : WebSecurityConfigurerAdapter() {
                 .antMatchers( "/utubed/**").permitAll()
                 .antMatchers( "/utubed/**").hasRole(UserRole.ADMIN.name)
                 .anyRequest()
-                .authenticated().and().x509()
+                .authenticated()
     }
 
 
