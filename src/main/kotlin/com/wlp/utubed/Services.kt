@@ -152,7 +152,7 @@ class UtubeD {
         // https://cloud.google.com/console
         search.setKey(apiKey);
         search.setQ(research);
-        search.setFields("items(id/videoId)");
+        search.setFields("items(id/videoId,snippet/thumbnails/default/url)");
         search.setMaxResults(15);
 
         // Call the API and print results.
@@ -170,6 +170,7 @@ class UtubeD {
         while (itsearch.hasNext()) {
 
             var searchResult = itsearch.next()
+            var snippet = searchResult.snippet
 
             var singleSearchResult = SearchResult()
 
@@ -188,7 +189,7 @@ class UtubeD {
                     singleSearchResult.channelTitle     = video.details().author()
                     singleSearchResult.description      = ""
                     singleSearchResult.title            = video.details().title()
-                    singleSearchResult.thumbnails       = video.details().thumbnails().get(0)
+                    singleSearchResult.thumbnails       = snippet.thumbnails.toString()
                     singleSearchResult.length           = sdf.format(Date((video.details().lengthSeconds() * 1000).toLong()))
 
                     result.add(singleSearchResult)
